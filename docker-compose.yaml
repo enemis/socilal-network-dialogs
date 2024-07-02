@@ -1,0 +1,59 @@
+version: "3.9"
+services:
+#  social_network_dialogs:
+#      container_name: social_network_dialogs
+#      build:
+#        context: .
+#        dockerfile: Dockerfile
+#      depends_on:
+#        - postgres_social
+#        - postgres_social_slave_1
+#      ports:
+#      - "${SERVER_PORT}:8080"
+
+  master:
+    container_name: "citus_master"
+    image: "citusdata/citus:12"
+    ports: ["${DB_PORT:-5432}:5432"]
+    labels: ["com.citusdata.role=Master"]
+    environment: &AUTH
+      POSTGRES_USER: "${DB_USERNAME:-postgres}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      PGUSER: "${DB_USERNAME:-postgres}"
+      PGPASSWORD: "${DB_PASSWORD}"
+      POSTGRES_HOST_AUTH_METHOD: "${POSTGRES_HOST_AUTH_METHOD:-trust}"
+  worker:
+    image: "citusdata/citus:12"
+    labels: ["com.citusdata.role=Worker"]
+    depends_on: [manager]
+    environment: *AUTH
+    command: "/wait-for-manager.sh"
+    volumes:
+      - healthcheck-volume:/healthcheck
+
+  manager:
+    container_name: "citus_manager"
+    image: "citusdata/membership-manager:0.3.0"
+    volumes:
+      - "${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock"
+      - healthcheck-volume:/healthcheck
+    depends_on: [master]
+    environment: *AUTH
+volumes:
+  healthcheck-volume:
+#
+#  postgres_social_dialogs:
+#    container_name: postgres_social_dialogs
+#    image: postgres:15.4
+#    environment:
+#      POSTGRES_DB: "${DB_NAME}"
+#      POSTGRES_USER: "${DB_USERNAME}"
+#      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+#    volumes:
+#      - ./pg-data-master:/var/lib/postgresql/data:delegated
+#    ports:
+#      - "${DB_PORT}:5432"
+
+networks:
+    default:
+        name: social_network
