@@ -13,9 +13,10 @@ type Config struct {
 	DBName     string `mapstructure:"DB_NAME"`
 	DBSSLMode  string `mapstructure:"DB_SSLMODE"`
 
-	HttpServer string `mapstructure:"HTTP_SERVER"`
-	Salt       string `mapstructure:"APP_SALT"`
-	SigningKey string `mapstructure:"APP_SIGNING_KEY"`
+	HttpServer  string `mapstructure:"HTTP_SERVER"`
+	Salt        string `mapstructure:"APP_SALT"`
+	SigningKey  string `mapstructure:"APP_SIGNING_KEY"`
+	GRPCAddress string `mapstructure:"GRPC_ADDRESS"`
 }
 
 func NewConfig() (*Config, error) {

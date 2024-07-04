@@ -1,3 +1,4 @@
+//go:generate protoc --proto_path=./internal/server/proto/ --go_out=./internal/server/proto/ --go-grpc_out=./internal/server/proto/ ./internal/server/proto/dialogs.proto ./internal/server/proto/pagination.proto
 package main
 
 import (
@@ -7,9 +8,7 @@ import (
 	"social-network-dialogs/internal/database"
 	"social-network-dialogs/internal/dialog"
 	"social-network-dialogs/internal/logger"
-	"social-network-dialogs/internal/rest/handler"
-	"social-network-dialogs/internal/rest/router"
-	"social-network-dialogs/internal/token"
+	"social-network-dialogs/internal/server"
 )
 
 func init() {
@@ -21,10 +20,8 @@ func main() {
 		logger.Module,
 		config.Module,
 		database.Module,
-		handler.Module,
-		router.Module,
-		token.Module,
 		dialog.Module,
+		server.Module,
 	)
 
 	fxContainer.Run()

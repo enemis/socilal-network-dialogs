@@ -19,7 +19,7 @@ func NewDialogRepository(db *database.DatabaseStack) *DialogRepository {
 	}
 }
 
-func (r *DialogRepository) GetPrivateDialog(user1 uuid.UUID, user2 uuid.UUID) (*Dialog, error) {
+func (r *DialogRepository) GetPrivateDialog(user1, user2 string) (*Dialog, error) {
 	var dialog Dialog
 	query := "SELECT d.* FROM dialog_participants dp1 " +
 		"INNER JOIN dialog_participants dp2 ON dp1.dialog_id = dp2.dialog_id " +
@@ -39,7 +39,7 @@ func (r *DialogRepository) GetPrivateDialog(user1 uuid.UUID, user2 uuid.UUID) (*
 	return &dialog, nil
 }
 
-func (r *DialogRepository) CreateDialog(dialog *Dialog, participants ...uuid.UUID) (*Dialog, error) {
+func (r *DialogRepository) CreateDialog(dialog *Dialog, participants ...string) (*Dialog, error) {
 	dialog.Id = uuid.New()
 
 	tx := r.db.GetWriteConnection().MustBeginTx(context.Background(), nil)
@@ -109,7 +109,7 @@ func (r *DialogRepository) GetDialog(dialogId uuid.UUID) (*Dialog, error) {
 	return &dialog, nil
 }
 
-func (r *DialogRepository) SendDirectMessage(recipientId uuid.UUID, senderId uuid.UUID, text string) (*Message, error) {
+func (r *DialogRepository) SendDirectMessage(recipientId, senderId string, text string) (*Message, error) {
 	dialog, err := r.GetPrivateDialog(recipientId, senderId)
 	if err != nil {
 		return nil, err
